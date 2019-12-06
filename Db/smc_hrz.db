@@ -1,0 +1,150 @@
+# File: smc_hrz.db
+# 
+# SMC Corp Thermo Chiller - HRZ Series
+# 
+# 
+# Macros
+#   P     - standard record prefix
+#   R     - standard record prefix
+#   PORT  - asyn port
+#   
+# Scaling
+#   The units for several values are 0.1/digit.  ASLO is set for scaling those
+#   records accordingly.  See manual for details.  
+#   
+# TODO
+#   Units for flow are hardcoded.  Set this based on status flag.  
+#   
+# Notes
+#   Outputs are tested but commented out.  We want local control only.  
+#   
+# Author: Wesley Moore
+# Date:   July 2014
+#
+
+record(asyn, "$(P)$(R)ASYN") {
+    field(PORT, "$(PORT)")
+    field(OEOS, "\r\n")
+    field(IEOS, "\r\n")
+}
+
+#######################################
+# Status Commands
+#   Word 0 (0x00) - Word 13 (0x0D)
+#######################################
+record(ai, "$(P)$(R)TEMP") {
+    field(DESC, "Fluid Temp")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn(SMC_In_Word 0)MODBUS_DATA")
+    field(PREC, "1")
+    field(ASLO, "0.1")
+    field(EGU,  "C")
+    field(SCAN, "I/O Intr")
+}
+
+record(ai, "$(P)$(R)FLOW") {
+    field(DESC, "Circ. Fluid Flow Rate")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn(SMC_In_Word 1)MODBUS_DATA")
+    field(PREC, "1")
+    field(ASLO, "0.1")
+    field(EGU,  "GPM")
+    field(SCAN, "I/O Intr")
+}
+
+record(ai, "$(P)$(R)PRESS") {
+    field(DESC, "Fluid Pressure")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn(SMC_In_Word 2)MODBUS_DATA")
+    field(PREC, "2")
+    field(ASLO, "0.01")
+    field(EGU,  "MPa")
+    field(SCAN, "I/O Intr")
+}
+
+record(ai, "$(P)$(R)MOHMS") {
+    field(DESC, "Fluid Electric Resistance")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn(SMC_In_Word 3)MODBUS_DATA")
+    field(PREC, "1")
+    field(ASLO, "0.1")
+    field(EGU,  "Megaohms")
+    field(SCAN, "I/O Intr")
+}
+
+record(mbbiDirect, "$(P)$(R)STATUS") {
+    field(DESC, "Status Flag")
+    field(DTYP, "asynUInt32Digital")
+    field(INP,  "@asynMask(SMC_In_Word 4 0xFFFF)MODBUS_DATA")
+    field(SCAN, "I/O Intr")
+    field(FLNK, "$(P)$(R)RUN_STAT.PROC")
+}
+
+record(bi, "$(P)$(R)RUN_STAT") {
+    field(DESC, "Run/Stop Status")
+    field(INP,  "$(P)$(R)STATUS.B0")
+    field(ZNAM, "STOPPED")
+    field(OSV,  "MAJOR")
+    field(ONAM, "RUNNING")
+    field(ZSV,  "NO_ALARM")
+}
+
+record(mbbiDirect, "$(P)$(R)ALARM1") {
+    field(DESC, "Alarm Flag 1")
+    field(DTYP, "asynUInt32Digital")
+    field(INP,  "@asynMask(SMC_In_Word 5 0xFFFF)MODBUS_DATA")
+    field(SCAN, "I/O Intr")
+}
+
+record(mbbiDirect, "$(P)$(R)ALARM2") {
+    field(DESC, "Alarm Flag 2")
+    field(DTYP, "asynUInt32Digital")
+    field(INP,  "@asynMask(SMC_In_Word 6 0xFFFF)MODBUS_DATA")
+    field(SCAN, "I/O Intr")
+}
+
+record(ai, "$(P)$(R)TEMP_SP_RBK") {
+    field(DESC, "Fluid Temp")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn(SMC_In_Word 0x0b)MODBUS_DATA")
+    field(PREC, "1")
+    field(ASLO, "0.1")
+    field(EGU,  "C")
+    field(SCAN, "I/O Intr")
+}
+
+########################################
+# Control Commands
+#   Word 11 (0x0B) - Word 13 (0x0D)
+########################################
+#record(ao, "$(P)$(R)TEMP_SP") {
+#    field(DESC, "Fluid Temp Setpoint")
+#    field(DTYP, "asynInt32")
+#    field(OUT,  "@asynMask(SMC_Out_Word 0 0xFFFF -16)MODBUS_DATA")
+#    field(PREC, "1")
+#    field(ASLO, "0.1")
+#    field(EGU,  "C")
+#    field(DRVL, "10.0")
+#    field(DRVH, "25.0")
+#}
+
+#record(ao, "$(P)$(R)FLOW_SP") {
+#    field(DESC, "Fluid Flow Rate")
+#    field(DTYP, "asynInt32")
+#    field(OUT,  "@asyn(SMC_Out_Word 2)MODBUS_DATA")
+#    field(EGU,  "GPM")
+#    field(PREC, "1")
+#    field(ASLO, "0.1")
+#    field(DRVL, "2.6")
+#    field(DRVH, "10.6")
+#}
+
+#record(mbbo, "$(P)$(R)RUN") {
+#    field(DESC, "Run/Stop")
+#    field(DTYP, "asynInt32")
+#    field(OUT,  "@asynMask(SMC_Out_Word 1 0x0001)MODBUS_DATA")
+#    field(ZRST, "Stop")
+#    field(ZRVL, "0")
+#    field(ONST, "Run")
+#    field(ONVL, "1")
+#}

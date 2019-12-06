@@ -1,0 +1,19 @@
+SMC Chiller Notes
+
+--------------------------------------------------------------------------------
+Moxa Settings
+--------------------------------------------------------------------------------
+
+Serial Settings
+  Baud Rate:    9600
+  Data bits:    7
+  Stop bits:    1
+  Parity:       Even
+  Flow Control: None
+  FIFO:         Enable
+  Interface:    RS-485 2-wire
+  
+Operating Settings
+  Operation Mode:   TCP Server Mode
+  ...
+  All others are default.
